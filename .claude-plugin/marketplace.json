@@ -1,12 +1,12 @@
 {
   "name": "cc-dev-workflow",
+  "owner": {
+    "name": "seethroughdev"
+  },
   "plugins": [
     {
       "name": "dev-workflow",
-      "source": {
-        "source": "github",
-        "repo": "seethroughdev/cc-dev-workflow"
-      }
+      "source": "./"
     }
   ]
 }
