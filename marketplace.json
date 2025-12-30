@@ -1,0 +1,12 @@
+{
+  "name": "cc-dev-workflow",
+  "plugins": [
+    {
+      "name": "dev-workflow",
+      "source": {
+        "source": "github",
+        "repo": "seethroughdev/cc-dev-workflow"
+      }
+    }
+  ]
+}
