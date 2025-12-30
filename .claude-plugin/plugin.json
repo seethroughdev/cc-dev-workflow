@@ -9,6 +9,38 @@
   "repository": "https://github.com/seethroughdev/cc-dev-workflow",
   "license": "MIT",
   "keywords": [],
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terminal-notifier -title 'Claude Code' -message 'Done' -sound Glass"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/hooks/heal-skills-trigger.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terminal-notifier -title 'Claude Code' -message 'Waiting for response' -sound Ping"
+          }
+        ]
+      }
+    ]
+  },
   "lspServers": {
     "pyright": {
       "command": "pyright-langserver",
