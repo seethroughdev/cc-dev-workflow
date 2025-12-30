@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/hooks/heal-skills-trigger.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/heal-skills-trigger.py\"",
             "timeout": 10
           }
         ]
