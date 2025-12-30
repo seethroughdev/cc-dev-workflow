@@ -1,0 +1,52 @@
+{
+  "name": "dev-workflow",
+  "version": "1.0.0",
+  "description": "Code quality tools and development workflow automation: audits, refactoring analysis, smart commits, and beads issue tracking",
+  "author": {
+    "name": "seethroughdev",
+    "url": "https://github.com/seethroughdev"
+  },
+  "repository": "https://github.com/seethroughdev/cc-dev-workflow",
+  "license": "MIT",
+  "keywords": [],
+  "lspServers": {
+    "pyright": {
+      "command": "pyright-langserver",
+      "args": ["--stdio"],
+      "extensionToLanguage": {
+        ".py": "python",
+        ".pyi": "python"
+      },
+      "initializationOptions": {
+        "python": {
+          "analysis": {
+            "autoSearchPaths": true,
+            "useLibraryCodeForTypes": true,
+            "diagnosticMode": "openFilesOnly"
+          }
+        }
+      }
+    },
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "extensionToLanguage": {
+        ".ts": "typescript",
+        ".tsx": "typescriptreact",
+        ".js": "javascript",
+        ".jsx": "javascriptreact",
+        ".mts": "typescript",
+        ".cts": "typescript",
+        ".mjs": "javascript",
+        ".cjs": "javascript"
+      },
+      "initializationOptions": {
+        "preferences": {
+          "includeInlayParameterNameHints": "all",
+          "includeInlayPropertyDeclarationTypeHints": true,
+          "includeInlayFunctionLikeReturnTypeHints": true
+        }
+      }
+    }
+  }
+}
