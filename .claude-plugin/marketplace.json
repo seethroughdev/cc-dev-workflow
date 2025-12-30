@@ -5,7 +5,7 @@
   },
   "plugins": [
     {
-      "name": "dev-workflow",
+      "name": "aa",
       "source": "./"
     }
   ]
