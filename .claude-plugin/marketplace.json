@@ -6,7 +6,8 @@
   "plugins": [
     {
       "name": "aa",
-      "source": "./"
+      "source": "./",
+      "version": "1.0.1"
     }
   ]
 }
