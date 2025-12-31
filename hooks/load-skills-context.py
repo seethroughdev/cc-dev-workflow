@@ -11,6 +11,7 @@ import sys
 import os
 import re
 from pathlib import Path
+from typing import Optional, List, Tuple, Dict
 
 
 def find_plugin_root() -> Path:
@@ -22,6 +23,58 @@ def find_plugin_root() -> Path:
     # Fall back to script location
     script_dir = Path(__file__).parent
     return script_dir.parent
+
+
+def get_all_skill_directories(plugin_root: Path, project_dir: Optional[str]) -> List[Tuple[Path, str]]:
+    """Get all directories that may contain skills.
+
+    Returns list of (path, source_label) tuples.
+    """
+    dirs = []
+
+    # 1. Global user skills: ~/.claude/skills
+    global_skills = Path.home() / ".claude" / "skills"
+    if global_skills.exists():
+        dirs.append((global_skills, "global"))
+
+    # 2. Project-specific skills: ${PROJECT_PATH}/.claude/skills
+    if project_dir:
+        project_skills = Path(project_dir) / ".claude" / "skills"
+        if project_skills.exists():
+            dirs.append((project_skills, "project"))
+
+    # 3. Plugin's own skills
+    plugin_skills = plugin_root / "skills"
+    if plugin_skills.exists():
+        dirs.append((plugin_skills, "plugin"))
+
+    return dirs
+
+
+def get_all_command_directories(plugin_root: Path, project_dir: Optional[str]) -> List[Tuple[Path, str]]:
+    """Get all directories that may contain commands.
+
+    Returns list of (path, source_label) tuples.
+    """
+    dirs = []
+
+    # 1. Global user commands: ~/.claude/commands
+    global_cmds = Path.home() / ".claude" / "commands"
+    if global_cmds.exists():
+        dirs.append((global_cmds, "global"))
+
+    # 2. Project-specific commands: ${PROJECT_PATH}/.claude/commands
+    if project_dir:
+        project_cmds = Path(project_dir) / ".claude" / "commands"
+        if project_cmds.exists():
+            dirs.append((project_cmds, "project"))
+
+    # 3. Plugin's own commands
+    plugin_cmds = plugin_root / "commands"
+    if plugin_cmds.exists():
+        dirs.append((plugin_cmds, "plugin"))
+
+    return dirs
 
 
 def parse_skill_frontmatter(content: str) -> dict:
@@ -41,63 +94,71 @@ def parse_skill_frontmatter(content: str) -> dict:
     return result
 
 
-def load_all_skills(plugin_root: Path) -> list[dict]:
-    """Load all skills from the skills directory."""
+def load_all_skills(plugin_root: Path, project_dir: Optional[str]) -> List[Dict]:
+    """Load all skills from all skill directories."""
     skills = []
-    skills_dir = plugin_root / "skills"
+    seen_names = set()
 
-    if not skills_dir.exists():
-        return skills
+    for skills_dir, source in get_all_skill_directories(plugin_root, project_dir):
+        for skill_dir in skills_dir.iterdir():
+            if not skill_dir.is_dir():
+                continue
 
-    for skill_dir in skills_dir.iterdir():
-        if not skill_dir.is_dir():
-            continue
+            skill_file = skill_dir / "SKILL.md"
+            if not skill_file.exists():
+                continue
 
-        skill_file = skill_dir / "SKILL.md"
-        if not skill_file.exists():
-            continue
+            try:
+                content = skill_file.read_text()
+                frontmatter = parse_skill_frontmatter(content)
 
-        try:
-            content = skill_file.read_text()
-            frontmatter = parse_skill_frontmatter(content)
+                # Extract keywords from description for matching
+                description = frontmatter.get("description", "")
+                name = frontmatter.get("name", skill_dir.name)
 
-            # Extract keywords from description for matching
-            description = frontmatter.get("description", "")
-            name = frontmatter.get("name", skill_dir.name)
+                # Skip duplicates (first one wins - global > project > plugin)
+                if name in seen_names:
+                    continue
+                seen_names.add(name)
 
-            skills.append({
-                "name": name,
-                "description": description,
-                "path": str(skill_file.relative_to(plugin_root))
-            })
-        except Exception:
-            continue
+                skills.append({
+                    "name": name,
+                    "description": description,
+                    "source": source,
+                    "path": str(skill_file)
+                })
+            except Exception:
+                continue
 
     return skills
 
 
-def load_all_commands(plugin_root: Path) -> list[dict]:
-    """Load all slash commands from the commands directory."""
+def load_all_commands(plugin_root: Path, project_dir: Optional[str]) -> List[Dict]:
+    """Load all slash commands from all command directories."""
     commands = []
-    commands_dir = plugin_root / "commands"
+    seen_names = set()
 
-    if not commands_dir.exists():
-        return commands
+    for commands_dir, source in get_all_command_directories(plugin_root, project_dir):
+        for cmd_file in commands_dir.glob("*.md"):
+            try:
+                content = cmd_file.read_text()
+                frontmatter = parse_skill_frontmatter(content)
 
-    for cmd_file in commands_dir.glob("*.md"):
-        try:
-            content = cmd_file.read_text()
-            frontmatter = parse_skill_frontmatter(content)
+                name = frontmatter.get("name", cmd_file.stem)
+                description = frontmatter.get("description", "")
 
-            name = frontmatter.get("name", cmd_file.stem)
-            description = frontmatter.get("description", "")
+                # Skip duplicates
+                if name in seen_names:
+                    continue
+                seen_names.add(name)
 
-            commands.append({
-                "name": name,
-                "description": description
-            })
-        except Exception:
-            continue
+                commands.append({
+                    "name": name,
+                    "description": description,
+                    "source": source
+                })
+            except Exception:
+                continue
 
     return commands
 
@@ -110,10 +171,11 @@ def main():
         input_data = {}
 
     plugin_root = find_plugin_root()
+    project_dir = input_data.get("cwd")
 
-    # Load skills and commands
-    skills = load_all_skills(plugin_root)
-    commands = load_all_commands(plugin_root)
+    # Load skills and commands from all locations
+    skills = load_all_skills(plugin_root, project_dir)
+    commands = load_all_commands(plugin_root, project_dir)
 
     if not skills and not commands:
         sys.exit(0)
@@ -124,13 +186,15 @@ def main():
     if skills:
         context_parts.append("## Available Skills (auto-activate when relevant)\n")
         for skill in skills:
-            context_parts.append(f"- **{skill['name']}**: {skill['description']}")
+            source_tag = f" [{skill['source']}]" if skill.get('source') else ""
+            context_parts.append(f"- **{skill['name']}**{source_tag}: {skill['description']}")
         context_parts.append("")
 
     if commands:
         context_parts.append("## Available Commands\n")
         for cmd in commands:
-            context_parts.append(f"- `/{cmd['name']}`: {cmd['description']}")
+            source_tag = f" [{cmd['source']}]" if cmd.get('source') else ""
+            context_parts.append(f"- `/{cmd['name']}`{source_tag}: {cmd['description']}")
         context_parts.append("")
 
     context_parts.append("When a user request matches a skill's purpose, proactively use that skill.")
