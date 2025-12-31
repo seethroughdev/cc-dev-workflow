@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Code quality tools and development workflow automation: audits, refactoring analysis, smart commits, and beads issue tracking",
   "author": {
     "name": "seethroughdev",
@@ -10,6 +10,26 @@
   "license": "MIT",
   "keywords": [],
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 hooks/load-skills-context.py"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 hooks/skill-activator.py"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
