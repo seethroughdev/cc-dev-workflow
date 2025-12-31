@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Code quality tools and development workflow automation: audits, refactoring analysis, smart commits, and beads issue tracking",
   "author": {
     "name": "seethroughdev",
@@ -36,6 +36,28 @@
           {
             "type": "command",
             "command": "terminal-notifier -title 'Claude Code' -message 'Waiting for response' -sound Tink"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/load-skills-context.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-activator.py\"",
+            "timeout": 3
           }
         ]
       }
