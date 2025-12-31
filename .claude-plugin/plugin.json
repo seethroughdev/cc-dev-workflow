@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -message 'Done' -sound Glass"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Done'"
           }
         ]
       }
@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -message 'Waiting for response' -sound Tink"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Waiting for response'"
           }
         ]
       }
