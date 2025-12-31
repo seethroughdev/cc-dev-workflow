@@ -58,6 +58,20 @@ The plugin integrates with `beads` (bd) for issue tracking:
 
 ## Development Notes
 
+### Version Bumping
+Bump the version in `.claude-plugin/plugin.json` with every change pushed to the repository.
+
+### Hook Paths
+Always use `${CLAUDE_PLUGIN_ROOT}` for hook script paths in `plugin.json`. Relative paths resolve against the user's project directory, not the plugin directory.
+
+```json
+// WRONG - breaks when used from other projects
+"command": "python3 hooks/skill-activator.py"
+
+// CORRECT - resolves to plugin directory
+"command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-activator.py\""
+```
+
 ### Testing Hooks
 Hooks read JSON from stdin and output JSON to stdout. Test with:
 ```bash
