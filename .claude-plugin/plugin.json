@@ -18,15 +18,6 @@
             "command": "terminal-notifier -title 'Claude Code' -message 'Done' -sound Glass"
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/heal-skills-trigger.py\"",
-            "timeout": 10
-          }
-        ]
       }
     ],
     "Notification": [
@@ -36,28 +27,6 @@
           {
             "type": "command",
             "command": "terminal-notifier -title 'Claude Code' -message 'Waiting for response' -sound Tink"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/load-skills-context.py\"",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-activator.py\"",
-            "timeout": 3
           }
         ]
       }
