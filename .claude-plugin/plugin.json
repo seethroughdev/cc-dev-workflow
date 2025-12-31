@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Code quality tools and development workflow automation: audits, refactoring analysis, smart commits, and beads issue tracking",
   "author": {
     "name": "seethroughdev",
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 hooks/load-skills-context.py"
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/load-skills-context.py\""
           }
         ]
       }
@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 hooks/skill-activator.py"
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-activator.py\""
           }
         ]
       }
