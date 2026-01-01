@@ -203,7 +203,7 @@ def load_commands_with_keywords(plugin_root: Path, project_dir: Optional[str]) -
     return commands
 
 
-def match_skills(prompt: str, skills: List[Dict], threshold: int = 2) -> List[Dict]:
+def match_skills(prompt: str, skills: List[Dict], threshold: int = 1) -> List[Dict]:
     """Find skills that match the user prompt."""
     prompt_keywords = extract_keywords(prompt)
     matches = []
@@ -211,12 +211,18 @@ def match_skills(prompt: str, skills: List[Dict], threshold: int = 2) -> List[Di
     for skill in skills:
         # Count keyword overlaps
         overlap = prompt_keywords & skill["keywords"]
-        if len(overlap) >= threshold:
+
+        # Give extra weight if skill name keywords match (strong signal)
+        name_keywords = extract_keywords(skill["name"].replace("-", " "))
+        name_overlap = prompt_keywords & name_keywords
+        score = len(overlap) + len(name_overlap)  # name matches count double
+
+        if score >= threshold:
             matches.append({
                 "name": skill["name"],
                 "description": skill["description"],
-                "matched_keywords": list(overlap),
-                "score": len(overlap)
+                "matched_keywords": list(overlap | name_overlap),
+                "score": score
             })
 
     # Sort by score descending
