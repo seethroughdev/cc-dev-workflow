@@ -1,5 +1,5 @@
 ---
-allowed-tools: Skill
+allowed-tools: Read, Glob, AskUserQuestion, Task, Skill
 description: Start an iterative development loop with auto-populated prompt (wraps ralph-wiggum)
 argument-hint: <task-description> [--max N]
 ---

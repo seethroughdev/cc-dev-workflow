@@ -1,7 +1,7 @@
 ---
 description: Create beads issues from a plan file (does not execute)
 argument-hint: <plan-path>
-allowed-tools: Read, Glob, Grep, Edit, Write, Bash, AskUserQuestion
+allowed-tools: Read, Glob, Grep, Edit, Write, Bash, AskUserQuestion, Task, Skill
 ---
 
 Create beads issues from the plan at {{plan_path}}.

@@ -1,6 +1,7 @@
 ---
 name: heal-skills
 description: Analyze session for skill learnings and propose improvements (self-learning system)
+allowed-tools: Read, Glob, AskUserQuestion, Task, Skill
 ---
 
 Activate the heal-skills skill to analyze this session for learnings.

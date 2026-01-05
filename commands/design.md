@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Task, Skill
 description: Invoke the frontend-design skill for UI/UX guidance and implementation
 argument-hint: <question or task>
 ---

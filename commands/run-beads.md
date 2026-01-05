@@ -1,7 +1,7 @@
 ---
 description: Execute ready beads issues with subagents
 argument-hint: [plan-path | epic-id | --all]
-allowed-tools: Read, Glob, Grep, Edit, Write, Bash, Task, AgentOutputTool, AskUserQuestion
+allowed-tools: Read, Glob, Grep, Edit, Write, Bash, Task, AgentOutputTool, AskUserQuestion, Skill
 ---
 
 Execute beads issues using subagent delegation.

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Task, Skill
 description: Simplify and clean up code - remove redundancy, dead code, AI slop, and unnecessary complexity
 argument-hint: <path|commit|description>
 ---
