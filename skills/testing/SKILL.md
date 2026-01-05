@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Cabin testing philosophy and patterns. Use when planning, writing, or reviewing tests. Enforces minimal regression-focused testing with no mock theater.
+description: Minimal regression-focused testing philosophy. Use when planning, writing, or reviewing tests. No mock theater.
 ---
 
 <objective>
@@ -127,12 +127,12 @@ def test_sanitize_removes_sql_operators():
 
 <fixtures>
 
-**Use project fixtures** in `tests/fixtures/`:
-- `httpx.py` - Auto-blocks HTTP (autouse)
-- `openai.py` - Mock OpenAI responses
-- `jina.py` - Mock Jina reranker
-- `bookmarks.py` - Sample bookmark data
-- `html_samples.py` - HTML test data
+**Use project fixtures** - check `tests/fixtures/` or `tests/conftest.py` for available fixtures.
+
+**Common fixture patterns:**
+- HTTP blocking fixtures (autouse) - prevent accidental network calls
+- External service mocks - configure return values, don't verify call counts
+- Sample data factories - real-ish data for testing transformations
 
 **Prefer real data over mocks**: Use actual sample data from fixtures when possible. Mocks should simulate external services, not internal logic.
 
