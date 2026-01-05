@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "Code quality tools and development workflow automation: audits, refactoring analysis, smart commits, and beads issue tracking",
   "author": {
     "name": "seethroughdev",

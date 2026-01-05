@@ -1,7 +1,7 @@
 ---
 description: Format, lint, and create logical commits from staged files
 argument-hint: [optional: push, rebase, merge, or other git operations]
-allowed-tools: Bash(git:*), Bash(npm:*), Bash(npx:*), Bash(make:*), Bash(ruff:*), Bash(uv:*), Read, Glob, AskUserQuestion
+allowed-tools: Bash(git:*), Bash(npm:*), Bash(npx:*), Bash(make:*), Bash(ruff:*), Bash(uv:*), Read, Glob, AskUserQuestion, Task, Skill
 ---
 
 <objective>
@@ -55,7 +55,33 @@ If any file has both staged AND unstaged changes:
    - Commit the group
    - Repeat for remaining groups
 
-6. **Handle additional operations**: If $ARGUMENTS provided (push, rebase, merge, etc.), execute after all commits complete.
+6. **Pre-push skill healing** (only if $ARGUMENTS contains "push"):
+   Before pushing, analyze if any skills could benefit from learnings in this session:
+
+   a. **Scan available skills**: Check these locations for SKILL.md files:
+      - `~/.claude/skills/*/SKILL.md` (global)
+      - `.claude/skills/*/SKILL.md` (project)
+      - Plugin skills directories
+
+   b. **Match skills to changes**: Review the committed changes and session context. Identify skills that:
+      - Were activated during this session
+      - Relate to the type of work done (testing, refactoring, commits, etc.)
+      - Could benefit from learnings based on any corrections, retries, or insights
+
+   c. **Ask user**: If relevant skills are found, use AskUserQuestion:
+      - "Would you like to run heal-skills before pushing?"
+      - Show which skills were detected as relevant
+      - Options: "Yes, heal all relevant skills", "Yes, let me choose which", "No, just push"
+
+   d. **Execute healing**: If user approves:
+      - For a single skill: invoke `/heal-skills --skill <skill-name>`
+      - For multiple skills: spawn parallel Task subagents, one per skill:
+        ```
+        Task(subagent_type="general-purpose", prompt="Run /heal-skills --skill <skill-name>")
+        ```
+      - Wait for all healing tasks to complete before pushing
+
+7. **Handle additional operations**: If $ARGUMENTS provided (push, rebase, merge, etc.), execute after all commits complete and any skill healing is done.
 </process>
 
 <commit_message_rules>
@@ -75,6 +101,7 @@ If any file has both staged AND unstaged changes:
 - Changes grouped into logical, atomic commits
 - Each commit message is specific, present tense, follows type(scope): format
 - No conflicts created between staged/unstaged changes
+- Pre-push skill healing offered if pushing (user can decline)
 - Additional git operations ($ARGUMENTS) completed if specified
 - Zero AI attribution in any commit
 </success_criteria>
