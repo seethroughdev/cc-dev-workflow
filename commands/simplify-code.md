@@ -19,7 +19,7 @@ $ARGUMENTS
    - **Git commit**: Run `git show --name-only <commit>` to get changed files
    - **Description**: Search the codebase to find matching files
 
-2. Read [references/patterns.md](mdc:.claude/skills/simplify-code/references/patterns.md) for specific patterns to identify
+2. Read the patterns reference file at `skills/simplify-code/references/patterns.md` for specific patterns to identify
 
 3. For each file, analyze and fix (in priority order):
    - Dead code (unused imports, functions, variables, unreachable code)

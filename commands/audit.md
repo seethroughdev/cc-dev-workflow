@@ -1,5 +1,4 @@
 ---
-name: audit
 description: Enterprise-grade code audit with 5 parallel sub-agents covering plan compliance, security, code quality, architecture, and completeness
 argument-hint: [plan-path or description of what to audit]
 allowed-tools: Read, Glob, Grep, AskUserQuestion, Task, Skill

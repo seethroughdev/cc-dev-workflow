@@ -1,6 +1,6 @@
 ---
-name: heal-skills
 description: Analyze session for skill learnings and propose improvements (self-learning system)
+argument-hint: [--skill <name>] [--dry-run]
 allowed-tools: Read, Glob, AskUserQuestion, Task, Skill
 ---
 

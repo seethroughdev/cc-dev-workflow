@@ -4,7 +4,7 @@ argument-hint: <plan-path>
 allowed-tools: Read, Glob, Grep, Edit, Write, Bash, AskUserQuestion, Task, Skill
 ---
 
-Create beads issues from the plan at {{plan_path}}.
+Create beads issues from the plan at $ARGUMENTS.
 
 <objective>
 Read the plan file, extract an epic and tasks, create beads issues, and add a reference section to the plan for correlation.
@@ -13,14 +13,14 @@ This command only creates issues - use `/run-beads` to execute them.
 </objective>
 
 <context>
-Plan file: @{{plan_path}}
+Plan file: @$ARGUMENTS
 Existing issues: !`bd list --status open --json`
 </context>
 
 <process>
 
 1. **Verify plan exists:**
-   - Read {{plan_path}}
+   - Read $ARGUMENTS
    - If plan doesn't exist: error and exit
    - Check if plan already has a `## Beads Issues` section (skip creation if so)
 
@@ -58,7 +58,7 @@ Existing issues: !`bd list --status open --json`
 
 4. **Add beads reference to plan file:**
 
-   Append a reference section to {{plan_path}}:
+   Append a reference section to $ARGUMENTS:
    ```markdown
 
    ## Beads Issues
@@ -67,8 +67,8 @@ Existing issues: !`bd list --status open --json`
 
    | Issue | Task |
    |-------|------|
-   | `cabin3-abc` | Task 1 title |
-   | `cabin3-def` | Task 2 title |
+   | `proj-abc` | Task 1 title |
+   | `proj-def` | Task 2 title |
    ```
 
 5. **Report:**

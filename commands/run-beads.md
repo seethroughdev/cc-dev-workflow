@@ -25,13 +25,13 @@ All open issues: !`bd list --status open --json`
 
 1. **Determine scope:**
 
-   - If `{{arguments}}` is a file path (contains `/` or ends in `.md`):
+   - If `$ARGUMENTS` is a file path (contains `/` or ends in `.md`):
      1. Read the plan file
      2. Find the `## Beads Issues` section
      3. Extract the epic ID from `Epic: \`<epic-id>\``
      4. Use that epic ID to scope execution
-   - If `{{arguments}}` is an epic ID: get child tasks of that epic
-   - If `{{arguments}}` is `--all`: get all ready issues
+   - If `$ARGUMENTS` is an epic ID: get child tasks of that epic
+   - If `$ARGUMENTS` is `--all`: get all ready issues
    - If no argument: list ready issues and ask user which to run
 
 2. **Validate issues are ready:**

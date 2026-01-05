@@ -10,4 +10,4 @@ Activate the `frontend-design@claude-code-plugins` skill to help with:
 - Accessibility and responsive design
 - Frontend implementation guidance
 
-{{ARGUMENTS}}
+$ARGUMENTS
