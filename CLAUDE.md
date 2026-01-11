@@ -20,16 +20,18 @@ cc-dev-workflow/
 │   ├── audit.md          # 5-parallel-agent code audit
 │   ├── commit.md         # Smart commit with format/lint
 │   ├── create-beads.md   # Create beads issues from plan files
-│   ├── heal-skills.md    # Self-learning skill improvement
-│   ├── refactor.md       # Refactoring opportunity analysis
+│   ├── loop.md           # Iterative dev loop (wraps ralph-wiggum)
+│   ├── pr.md             # PR description generator with Linear integration
 │   ├── run-beads.md      # Execute beads issues with subagents
-│   └── testing.md        # Test planning and review
+│   └── simplify-code.md  # Code simplification and cleanup
 ├── skills/               # Skills (auto-activated or manually invoked)
 │   ├── heal-skills/      # Session transcript analysis for improvements
+│   ├── manage-linear/    # Linear ticket management without MCP
 │   ├── refactor-specialist/  # Dead code, complexity, duplication detection
+│   ├── simplify-code/    # Code cleanup and simplification
 │   └── testing/          # Minimal regression-focused testing philosophy
 └── hooks/                # Event hooks (Python scripts)
-    ├── heal-skills-trigger.py  # Stop hook: suggest /heal-skills if learnings detected
+    ├── heal-skills-trigger.py  # Stop: suggest /heal-skills if learnings detected
     ├── load-skills-context.py  # SessionStart: inject available skills manifest
     └── skill-activator.py      # UserPromptSubmit: match skills to user prompts
 ```
@@ -41,10 +43,12 @@ cc-dev-workflow/
 - **Skills** (`skills/*/SKILL.md`): Domain knowledge that can be auto-activated by hooks or manually invoked. Have structured XML sections (`<objective>`, `<process>`, etc.).
 
 ### Hook System
-Three Python hooks handle different events:
+Three Python hooks handle skill discovery, activation, and learning:
 1. **SessionStart** (`load-skills-context.py`): Scans all skill directories and injects a manifest into context
 2. **UserPromptSubmit** (`skill-activator.py`): Keyword-matches user prompts to suggest relevant skills
-3. **Stop** (`heal-skills-trigger.py`): Analyzes transcript for skill usage + errors/corrections, suggests `/heal-skills` if learnings detected
+3. **Stop** (`heal-skills-trigger.py`): Detects if skills were used + errors/corrections occurred, suggests `/heal-skills`
+
+Additional hooks for notifications (macOS only via `terminal-notifier`) on Stop and permission prompts.
 
 ### Skill Locations (priority order)
 1. Global: `~/.claude/skills/`

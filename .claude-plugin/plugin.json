@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Code quality tools and development workflow automation: audits, refactoring analysis, smart commits, and beads issue tracking",
   "author": {
     "name": "seethroughdev",
@@ -33,6 +33,10 @@
     "Stop": [
       {
         "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/heal-skills-trigger.py\""
+          },
           {
             "type": "command",
             "command": "terminal-notifier -title 'Claude Code' -message 'Done'"

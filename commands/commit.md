@@ -1,7 +1,7 @@
 ---
 description: Format, lint, and create logical commits from staged files
 argument-hint: [optional: push, rebase, merge, or other git operations]
-allowed-tools: Bash(git:*), Bash(npm:*), Bash(npx:*), Bash(make:*), Bash(ruff:*), Bash(uv:*), Read, Glob, AskUserQuestion, Task, Skill
+allowed-tools: Bash(git *), Bash(npm *), Bash(npx *), Bash(make *), Bash(ruff *), Bash(uv *), Read, Glob, AskUserQuestion, Task, Skill
 ---
 
 <objective>
