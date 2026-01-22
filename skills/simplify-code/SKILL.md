@@ -1,11 +1,33 @@
 ---
 name: simplify-code
-description: Code simplification and cleanup after feature development. Use when finishing a feature, reviewing code quality, or when asked to simplify, clean up, or polish code. Accepts file paths, directory paths, git commits, or descriptions of where to find files. Removes redundancy, duplication, dead code, AI slop, and unnecessary complexity while ensuring code is clean, clear, and passes linting.
+description: Code simplification, cleanup, and refactoring analysis. Use when finishing a feature, reviewing code quality, or when asked to simplify, clean up, refactor, or polish code. Supports analysis-only mode with severity ratings or action mode that makes changes directly.
 ---
 
-# Code Simplification
+# Code Simplification & Refactoring
 
 Analyze and simplify code to produce clean, thoughtful, production-ready output.
+
+## Modes
+
+**Action mode (default)**: Analyze and fix issues directly
+```
+/simplify-code src/api/
+```
+
+**Analysis mode**: Report findings with severity, don't make changes
+```
+/simplify-code src/api/ --analyze
+```
+
+**Changed files**: Analyze files changed since branching from main
+```
+/simplify-code --changed
+```
+
+**Severity filter**: Only show/fix issues of certain severity
+```
+/simplify-code src/ --severity high
+```
 
 ## Workflow
 
@@ -15,10 +37,7 @@ Parse the argument to determine what to analyze:
 
 **File/directory path**: Read directly
 ```bash
-# Single file
 /path/to/file.py
-
-# Directory (glob for code files)
 /path/to/feature/
 ```
 
@@ -28,25 +47,58 @@ git show --name-only <commit>
 git diff <commit>^ <commit> --name-only
 ```
 
-**Description**: Search codebase for matching files
+**--changed flag**: Files changed since main
 ```bash
-# "the auth module" → search for auth-related files
-grep -r "auth" --include="*.py" -l
+git diff --name-only main...HEAD
 ```
+
+**Description**: Search codebase for matching files
 
 ### 2. Analyze Each File
 
 Read files and identify issues. See [references/patterns.md](references/patterns.md) for specific patterns.
 
-**Priority order** (fix highest impact first):
-1. Dead code (unused imports, functions, variables)
-2. Duplication (repeated logic that should be extracted)
-3. Over-engineering (abstractions without justification)
-4. Verbose patterns (can be expressed more concisely)
-5. Redundant comments (stating the obvious)
-6. Inconsistent style (naming, formatting)
+**Categories and severity:**
 
-### 3. Apply Simplifications
+| Category | HIGH | MEDIUM | LOW |
+|----------|------|--------|-----|
+| Dead code | Unused functions/classes | Unused imports/variables | Commented-out code |
+| Complexity | >50 lines, >4 nesting, >6 params | 30-50 lines, 3-4 nesting | - |
+| Duplication | Repeated logic blocks | Similar functions | - |
+| Over-engineering | Unnecessary abstractions | Premature generalization | - |
+| Naming | Misleading names | Inconsistent conventions | Single-letter vars |
+| Structure | >500 line files | Mixed concerns | - |
+| AI slop | Excessive error handling | Over-logging | Defensive copies |
+
+### 3a. Analysis Mode (--analyze)
+
+Present findings grouped by category:
+
+```
+## Refactoring Opportunities
+
+### Dead Code (3 issues)
+**[HIGH]** `src/api/routes.py:45` - Unused function `old_handler()`
+  → Remove or determine if this should be called somewhere
+
+**[MEDIUM]** `src/models/user.py:8` - Unused import `Optional`
+  → Remove unused import
+
+### Complexity (2 issues)
+**[HIGH]** `src/services/processor.py:78-150` - Function `process_data()` is 72 lines
+  → Extract helper functions for distinct operations
+
+---
+**Summary**: 5 issues (2 high, 2 medium, 1 low)
+```
+
+Then ask:
+1. **Fix all issues** - Make the changes now
+2. **Fix high-severity only** - Address critical issues, plan the rest
+3. **Create plan file** - Write to `.planning/refactor-PLAN.md`
+4. **Done** - Just wanted the analysis
+
+### 3b. Action Mode (default)
 
 Make changes using the Edit tool. For each change:
 - Explain what's being simplified and why
@@ -112,7 +164,7 @@ return condition
 
 ## Output
 
-Report changes made:
+**Action mode** - Report changes made:
 ```
 Simplified 3 files:
 
@@ -124,7 +176,32 @@ src/auth/login.py
 src/api/routes.py
   - Removed dead code block (unreachable after early return)
   - Combined duplicate validation logic
+```
 
-src/models/user.py
-  - Removed redundant comments
+**Analysis mode** - Report findings with severity and offer next steps.
+
+## Plan File Format
+
+When creating a plan file (`.planning/refactor-YYYY-MM-DD-PLAN.md`):
+
+```markdown
+# Refactor Plan: [target]
+
+Generated: [date]
+Scope: [path or "changed files"]
+
+## High Priority
+
+- [ ] `file:line` - Description
+  - How to fix
+
+## Medium Priority
+
+- [ ] `file:line` - Description
+  - How to fix
+
+## Low Priority
+
+- [ ] `file:line` - Description
+  - How to fix
 ```

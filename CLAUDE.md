@@ -21,14 +21,11 @@ cc-dev-workflow/
 │   ├── commit.md         # Smart commit with format/lint
 │   ├── create-beads.md   # Create beads issues from plan files
 │   ├── loop.md           # Iterative dev loop (wraps ralph-wiggum)
-│   ├── pr.md             # PR description generator with Linear integration
-│   ├── run-beads.md      # Execute beads issues with subagents
-│   └── simplify-code.md  # Code simplification and cleanup
+│   └── run-beads.md      # Execute beads issues with subagents
 ├── skills/               # Skills (auto-activated or manually invoked)
 │   ├── heal-skills/      # Session transcript analysis for improvements
-│   ├── manage-linear/    # Linear ticket management without MCP
-│   ├── refactor-specialist/  # Dead code, complexity, duplication detection
-│   ├── simplify-code/    # Code cleanup and simplification
+│   ├── pr/               # PR description generator from git changes
+│   ├── simplify-code/    # Code cleanup, simplification, and refactoring analysis
 │   └── testing/          # Minimal regression-focused testing philosophy
 └── hooks/                # Event hooks (Python scripts)
     ├── heal-skills-trigger.py  # Stop: suggest /heal-skills if learnings detected
@@ -40,7 +37,7 @@ cc-dev-workflow/
 
 ### Commands vs Skills
 - **Commands** (`commands/*.md`): User-invoked via `/command-name`. Have YAML frontmatter with `description`, `argument-hint`, and optional `allowed-tools`.
-- **Skills** (`skills/*/SKILL.md`): Domain knowledge that can be auto-activated by hooks or manually invoked. Have structured XML sections (`<objective>`, `<process>`, etc.).
+- **Skills** (`skills/*/SKILL.md`): Domain knowledge that can be auto-activated by hooks or manually invoked. Have YAML frontmatter (`name`, `description`) and markdown body with workflow instructions.
 
 ### Hook System
 Three Python hooks handle skill discovery, activation, and learning:
