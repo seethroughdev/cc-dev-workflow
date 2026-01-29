@@ -60,7 +60,7 @@ The plugin integrates with `beads` (bd) for issue tracking:
 ## Development Notes
 
 ### Version Bumping
-Bump the version in `.claude-plugin/plugin.json` with every change pushed to the repository.
+Bump the version in **both** `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` with every change pushed to the repository. These must stay in sync.
 
 ### Hook Paths
 Always use `${CLAUDE_PLUGIN_ROOT}` for hook script paths in `plugin.json`. Relative paths resolve against the user's project directory, not the plugin directory.
