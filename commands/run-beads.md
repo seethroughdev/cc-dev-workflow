@@ -24,7 +24,12 @@ All open issues: !`bd list --status open --json`
 
 <process>
 
-1. **Determine scope:**
+1. **Sync beads state:**
+   ```bash
+   bd sync
+   ```
+
+2. **Determine scope:**
 
    - If `$ARGUMENTS` is a file path (contains `/` or ends in `.md`):
      1. Read the plan file
@@ -35,12 +40,12 @@ All open issues: !`bd list --status open --json`
    - If `$ARGUMENTS` is `--all`: get all ready issues
    - If no argument: list ready issues and ask user which to run
 
-2. **Validate issues are ready:**
+3. **Validate issues are ready:**
    - Check each issue has no open blockers
    - Skip blocked issues with a warning
    - If no ready issues: report and exit
 
-3. **Execute issues:**
+4. **Execute issues:**
 
    **Default behavior (sequential):** Process ready issues one at a time.
 
@@ -52,16 +57,24 @@ All open issues: !`bd list --status open --json`
    For each ready issue:
 
    ```
-   1. Claim the issue: bd update <issue-id> --status in_progress --json
+   1. Claim the issue atomically:
+      bd update <issue-id> --claim --json
+      # --claim sets assignee + status in one step, preventing race conditions
 
-   2. Check if in a worktree: `[ -f .git ]`
+   2. Get full issue context:
+      bd show <issue-id> --json
+      # Retrieve complete issue with all fields (description, design, acceptance, notes)
 
-   3. Spawn a subagent (Task tool, subagent_type="general-purpose"):
+   3. Check if in a worktree: `[ -f .git ]`
+
+   4. Spawn a subagent (Task tool, subagent_type="general-purpose"):
 
       "Execute beads issue <issue-id>: <issue-title>
 
-      Description: <description>
-      Acceptance criteria: <acceptance>
+      Description: <description from bd show>
+      Acceptance criteria: <acceptance from bd show>
+      Design notes: <design from bd show>
+      Additional notes: <notes from bd show>
       Priority: <priority>
 
       [If in worktree, add:]
@@ -78,26 +91,31 @@ All open issues: !`bd list --status open --json`
 
       Report: files modified, test results, any blockers"
 
-   4. For sequential: Wait for subagent (TaskOutput), then proceed to next
+   5. For sequential: Wait for subagent (TaskOutput), then proceed to next
       For parallel: Launch all eligible subagents together, then collect results with TaskOutput
 
-   5. On success: bd close <issue-id> --reason "<summary>"
-   6. On failure: leave as in_progress, record error
-   7. Re-check ready issues: `bd ready --json` (closing an issue may unblock others)
-   8. Update remaining work list with newly unblocked issues
-   9. Proceed to next ready issue (or next batch if parallel)
+   6. On success:
+      bd close <issue-id> --reason "<summary>"
+      bd sync
+
+   7. On failure: leave as in_progress, record error
+
+   8. Re-check ready issues: `bd ready --json` (closing an issue may unblock others)
+   9. Update remaining work list with newly unblocked issues
+   10. Proceed to next ready issue (or next batch if parallel)
    ```
 
    **Execution mode rules:**
    - **Sequential (default):** Only ONE subagent running at a time. Wait for completion before starting next.
    - **Parallel (when told):** Launch multiple Task tool calls in a SINGLE message when explicitly informed by dependency analysis that issues are independent.
 
-4. **Finalize:**
+5. **Finalize:**
    - Run full test suite per project conventions
    - Run linting per project conventions
+   - `bd sync` to persist final state
    - Report summary: succeeded, failed, still blocked
 
-5. **Offer next steps:**
+6. **Offer next steps:**
    - If all succeeded: "Ready to commit? Run `/commit`"
    - If failures: show failed issues, ask to retry or skip
 
@@ -106,6 +124,7 @@ All open issues: !`bd list --status open --json`
 <success_criteria>
 - All targeted issues executed and closed
 - Code tested and linted
+- Beads state synced at key points
 - Clear report of outcomes
 </success_criteria>
 

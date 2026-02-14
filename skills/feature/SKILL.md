@@ -17,7 +17,7 @@ Feature: **$ARGUMENTS**
 Collect everything the user knows before asking questions.
 
 **Critical behavior:**
-- Respond ONLY with "Got it. What else?" after each input
+- Respond ONLY with "✓" after each input
 - NO questions, suggestions, or commentary during intake
 - Continue until user signals done ("done", "that's it", "finished", etc.)
 
@@ -54,4 +54,4 @@ Save to `.planning/NNN-feature-name-PLAN.md` (check existing files for next numb
 
 **Begin:** Acknowledge the feature, then say:
 
-"Ready for intake. Tell me everything you know about this feature. I'll respond with 'Got it. What else?' until you're done."
+"Ready for intake. Tell me everything you know about this feature. I'll respond with '✓' until you're done."
