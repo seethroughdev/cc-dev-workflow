@@ -24,12 +24,7 @@ All open issues: !`bd list --status open --json`
 
 <process>
 
-1. **Sync beads state:**
-   ```bash
-   bd sync
-   ```
-
-2. **Determine scope:**
+1. **Determine scope:**
 
    - If `$ARGUMENTS` is a file path (contains `/` or ends in `.md`):
      1. Read the plan file
@@ -40,10 +35,16 @@ All open issues: !`bd list --status open --json`
    - If `$ARGUMENTS` is `--all`: get all ready issues
    - If no argument: list ready issues and ask user which to run
 
-3. **Validate issues are ready:**
-   - Check each issue has no open blockers
-   - Skip blocked issues with a warning
+2. **Validate issues are ready:**
+   - Use `bd ready --json` to get issues with no open blockers
+   - Use `bd blocked --json` to identify and report blocked issues
+   - Skip issues with `deferred` status or children of deferred parents
    - If no ready issues: report and exit
+
+3. **Optionally preview dependency graph:**
+   ```bash
+   bd graph <epic-id>
+   ```
 
 4. **Execute issues:**
 
@@ -63,7 +64,7 @@ All open issues: !`bd list --status open --json`
 
    2. Get full issue context:
       bd show <issue-id> --json
-      # Retrieve complete issue with all fields (description, design, acceptance, notes)
+      # Returns: title, description, design, acceptance, notes, labels, priority, parent
 
    3. Check if in a worktree: `[ -f .git ]`
 
@@ -75,11 +76,13 @@ All open issues: !`bd list --status open --json`
       Acceptance criteria: <acceptance from bd show>
       Design notes: <design from bd show>
       Additional notes: <notes from bd show>
-      Priority: <priority>
+      Labels: <labels from bd show>
+      Priority: <priority> (P0=critical, P1=high, P2=medium, P3=low, P4=backlog)
+      Parent epic: <parent title if applicable>
 
       [If in worktree, add:]
       Git context: You are in a git worktree. Beads state is shared across
-      worktrees. Do not switch branches or modify other worktrees.
+      worktrees via Dolt. Do not switch branches or modify other worktrees.
 
       Instructions:
       1. Read CLAUDE.md for project conventions (test commands, lint commands, etc.)
@@ -92,15 +95,17 @@ All open issues: !`bd list --status open --json`
       Report: files modified, test results, any blockers"
 
    5. For sequential: Wait for subagent (TaskOutput), then proceed to next
-      For parallel: Launch all eligible subagents together, then collect results with TaskOutput
+      For parallel: Launch all eligible subagents together, then collect results
 
    6. On success:
-      bd close <issue-id> --reason "<summary>"
-      bd sync
+      bd close <issue-id> --reason "<summary>" --force --json
+      # --force bypasses gate checks (gh:pr, gh:run, timer, bead)
+      # Gates are for human workflows; subagent execution closes directly
 
    7. On failure: leave as in_progress, record error
 
-   8. Re-check ready issues: `bd ready --json` (closing an issue may unblock others)
+   8. Re-check ready issues: `bd ready --json`
+      # Closing an issue may unblock dependent tasks
    9. Update remaining work list with newly unblocked issues
    10. Proceed to next ready issue (or next batch if parallel)
    ```
@@ -112,7 +117,6 @@ All open issues: !`bd list --status open --json`
 5. **Finalize:**
    - Run full test suite per project conventions
    - Run linting per project conventions
-   - `bd sync` to persist final state
    - Report summary: succeeded, failed, still blocked
 
 6. **Offer next steps:**
@@ -124,7 +128,6 @@ All open issues: !`bd list --status open --json`
 <success_criteria>
 - All targeted issues executed and closed
 - Code tested and linted
-- Beads state synced at key points
 - Clear report of outcomes
 </success_criteria>
 
@@ -133,49 +136,22 @@ If a subagent fails:
 1. Leave issue as in_progress
 2. Report which issues succeeded vs failed
 3. Ask user: retry, skip, or abort remaining
+
+If unexpected errors occur:
+- Run `bd doctor` to check for database issues
+- Use `bd stale --days 1` to find abandoned in_progress issues
+- Use `bd reopen <id> --reason "Retrying"` for failed-then-fixed scenarios
 </error_handling>
 
-<git_worktree_handling>
-When working in a git worktree (detected by `.git` being a file pointing to the main repo):
+<worktree_handling>
+When working in a git worktree (detected by `.git` being a file, not a directory):
 
-**Detection:**
-```bash
-# Check if in a worktree
-if [ -f .git ]; then
-  # This is a worktree - .git is a file, not a directory
-  MAIN_WORKTREE=$(git rev-parse --git-common-dir | sed 's/\.git$//')
-fi
-```
+1. **Beads storage is shared**: The `.beads/` directory lives in the main worktree. All worktrees share the same Dolt database. This is intentional.
 
-**Best practices for worktrees with beads:**
+2. **Use `--claim` to prevent double-claiming**: The atomic claim prevents race conditions when multiple worktrees work concurrently.
 
-1. **Beads storage is shared**: The `.beads/` directory lives in the main worktree. All worktrees share the same beads database. This is intentional - issues are project-wide, not branch-specific.
-
-2. **Before starting work in a worktree:**
-   ```bash
-   git fetch origin          # Get latest refs
-   bd sync                   # Sync beads state
-   bd ready                  # Check available work
-   ```
-
-3. **Worktree-specific commits:**
-   - Each worktree has its own branch and staging area
-   - Commits made in a worktree stay on that worktree's branch
-   - Run `bd sync` after commits to update beads state
-
-4. **Avoid conflicts:**
-   - Only one session should modify `.beads/` at a time
-   - If you get merge conflicts in `.beads/`, prefer the version with more recent timestamps
-   - Run `bd doctor` to check for sync issues
-
-5. **Cross-worktree coordination:**
-   - Use `bd list --status in_progress` to see what's being worked on
-   - Avoid claiming issues already in_progress in another worktree
-   - Close issues promptly to free them for other worktrees
-
-6. **Subagent instructions for worktrees:**
+3. **Subagent instructions for worktrees:**
    When spawning subagents in a worktree context, include:
    - "You are in a git worktree, not the main repo"
-   - "Beads state is shared - run `bd sync` if you need latest state"
-   - "Do not switch branches or modify other worktrees"
-</git_worktree_handling>
+   - "Beads state is shared via Dolt — do not switch branches or modify other worktrees"
+</worktree_handling>
